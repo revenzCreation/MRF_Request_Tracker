@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRF | Upload, Status &amp; Count Tracker</title>
+<link rel="icon" type="image/png" sizes="1600x1507" href="images/logo.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Special+Elite&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <h1>MRF Monitor</h1>
+      <div class="sub">Manpower Request Form — upload, status &amp; count tracker</div>
+    </div>
+    <nav class="tabs">
+      <button data-tab="dashboard" class="active">Dashboard</button>
+      <button data-tab="requests">All Requests</button>
+      <button data-tab="new">+ New Request</button>
+    </nav>
+  </header>
+
+  <!-- DASHBOARD -->
+  <section id="view-dashboard" class="view active">
+    <div class="stat-row" id="statRow"></div>
+
+    <div class="two-col">
+      <div class="panel">
+        <h2>Status Breakdown</h2>
+        <div class="stack-bar" id="stackBar"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="panel">
+        <h2>Recent Activity</h2>
+        <ul class="activity" id="activityList"></ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Requests by Department</h2>
+      <div id="deptBars"></div>
+    </div>
+  </section>
+
+  <!-- REQUESTS -->
+  <section id="view-requests" class="view">
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Search department, position, MRF #...">
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option>Pending</option>
+        <option>In Review</option>
+        <option>Approved</option>
+        <option>Rejected</option>
+        <option>Fulfilled</option>
+      </select>
+      <select id="sortSelect">
+        <option value="new">Newest first</option>
+        <option value="old">Oldest first</option>
+        <option value="needed">Date needed (soonest)</option>
+        <option value="headcount">Headcount (highest)</option>
+      </select>
+      <button class="btn" id="refreshBtn">Refresh</button>
+    </div>
+    <div class="panel" style="padding:0;overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Copy</th><th>MRF #</th><th>Department</th><th>Position</th>
+            <th>Headcount</th><th>Date Needed</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="big">No requests logged yet</div>
+        <div>Upload your first hard copy from the "+ New Request" tab.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW REQUEST -->
+  <section id="view-new" class="view">
+    <div class="panel">
+      <h2>Log a Manpower Request</h2>
+      <form id="mrfForm">
+        <div class="upload-box" id="uploadBox">
+          <input type="file" id="fileInput" style="display:none;">
+          <div id="uploadPlaceholder">
+            <div class="icon">📂</div>
+            <div><strong>Click to upload</strong> or drag the request file here</div>
+            <div class="hint">Any file type, maximum file size 5 MB. Images are compressed automatically before saving.</div>
+          </div>
+          <img id="previewImg" style="display:none;">
+        </div>
+
+        <div class="form-grid" style="margin-top:16px;">
+          <div class="field">
+            <label>MRF Number</label>
+            <input type="text" id="f_mrfnum" placeholder="e.g. MRF-2026-045">
+          </div>
+          <div class="field">
+            <label>Requesting Department</label>
+            <input type="text" id="f_dept" placeholder="e.g. Warehouse Ops" required>
+          </div>
+          <div class="field">
+            <label>Position Requested</label>
+            <input type="text" id="f_position" placeholder="e.g. Forklift Operator" required>
+          </div>
+          <div class="field">
+            <label>Headcount</label>
+            <input type="number" id="f_count" min="1" value="1" required>
+          </div>
+          <div class="field">
+            <label>Date Requested</label>
+            <input type="date" id="f_daterequested">
+          </div>
+          <div class="field">
+            <label>Date Needed</label>
+            <input type="date" id="f_dateneeded">
+          </div>
+          <div class="field">
+            <label>Requested By</label>
+            <input type="text" id="f_requestedby" placeholder="Name / designation">
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="f_status">
+              <option>Pending</option>
+              <option>In Review</option>
+              <option>Approved</option>
+              <option>Rejected</option>
+              <option>Fulfilled</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Remarks</label>
+            <textarea id="f_remarks" placeholder="Justification, notes, approver comments..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn ghost" id="resetFormBtn">Clear</button>
+          <button type="submit" class="btn">Save Request</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>
+
+<!-- VIEW/EDIT MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <span class="close" id="modalClose">&times;</span>
+    <h3 id="modalTitle">Request Detail</h3>
+    <img id="modalImg" style="display:none;">
+    <div class="detail-grid" id="modalDetails"></div>
+    <div class="field" style="margin-bottom:10px;">
+      <label>Status</label>
+      <select id="modalStatus" class="status-select" style="width:100%;padding:8px;"></select>
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Remarks</label>
+      <textarea id="modalRemarks"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn danger small" id="deleteBtn">Delete</button>
+      <button class="btn small" id="saveModalBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
