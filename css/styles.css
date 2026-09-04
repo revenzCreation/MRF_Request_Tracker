@@ -27,7 +27,7 @@ button, [role="button"], .upload-box, .thumb {
 body {
   background: 
     linear-gradient(rgba(15, 17, 23, 0.88), rgba(15, 17, 23, 0.94)), 
-    url('https://images.unsplash.com/photo-1565610222536-ef125c59da2e?auto=format&fit=crop&w=1920&q=80');
+    url('../images/BG.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -262,7 +262,7 @@ select.status-select {
 body {
   background:
     linear-gradient(110deg, rgba(10, 15, 17, 0.95), rgba(10, 15, 17, 0.77)),
-    url('https://images.unsplash.com/photo-1565610222536-ef125c59da2e?auto=format&fit=crop&w=1920&q=80');
+    url('../images/BG.png');
   color: var(--ink);
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: 0;
