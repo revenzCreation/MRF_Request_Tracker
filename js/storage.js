@@ -1,35 +1,21 @@
-import { API_URL } from './config.js';
-
 function requireApiUrl() {
-  if (!API_URL || !/^https?:\/\//i.test(API_URL)) {
-    throw new Error('Set a valid Google Apps Script URL in js/config.js');
+  const configuredUrl = window.HR_PORTAL_SHEETS?.getApiUrl?.() || window.HR_PORTAL_API_URL || '';
+
+  if (!configuredUrl || !/^https?:\/\//i.test(configuredUrl)) {
+    throw new Error('Set a valid Google Apps Script URL in the shared Sheets config.');
   }
-  return API_URL;
+
+  return configuredUrl;
 }
 
 async function request(options = {}) {
-  const response = await fetch(requireApiUrl(), {
+  return window.HR_PORTAL_SHEETS.request({
     ...options,
     headers: {
       'Content-Type': 'text/plain;charset=utf-8',
       ...(options.headers || {})
     }
   });
-
-  const rawText = await response.text();
-  let result;
-
-  try {
-    result = rawText ? JSON.parse(rawText) : {};
-  } catch (error) {
-    throw new Error(`Invalid API response from Google Apps Script (${response.status}).`);
-  }
-
-  if (!response.ok || !result || result.ok === false) {
-    throw new Error(result && result.error ? result.error : 'Google Sheets request failed');
-  }
-
-  return result;
 }
 
 export async function loadAllRecords() {
