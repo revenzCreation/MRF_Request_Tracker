@@ -90,7 +90,8 @@
       <h2>Log a Manpower Request</h2>
       <form id="mrfForm">
         <div class="upload-box" id="uploadBox">
-          <input type="file" id="fileInput" style="display:none;">
+          <label for="fileInput" class="sr-only">Upload request file</label>
+          <input type="file" id="fileInput" style="display:none;" aria-label="Upload request file">
           <div id="uploadPlaceholder">
             <div class="icon">📂</div>
             <div><strong>Click to upload</strong> or drag the request file here</div>
@@ -101,35 +102,35 @@
 
         <div class="form-grid" style="margin-top:16px;">
           <div class="field">
-            <label>MRF Number</label>
+            <label for="f_mrfnum">MRF Number</label>
             <input type="text" id="f_mrfnum" placeholder="e.g. MRF-2026-045">
           </div>
           <div class="field">
-            <label>Requesting Department</label>
+            <label for="f_dept">Requesting Department</label>
             <input type="text" id="f_dept" placeholder="e.g. Warehouse Ops" required>
           </div>
           <div class="field">
-            <label>Position Requested</label>
+            <label for="f_position">Position Requested</label>
             <input type="text" id="f_position" placeholder="e.g. Forklift Operator" required>
           </div>
           <div class="field">
-            <label>Headcount</label>
+            <label for="f_count">Headcount</label>
             <input type="number" id="f_count" min="1" value="1" required>
           </div>
           <div class="field">
-            <label>Date Requested</label>
+            <label for="f_daterequested">Date Requested</label>
             <input type="date" id="f_daterequested">
           </div>
           <div class="field">
-            <label>Date Needed</label>
+            <label for="f_dateneeded">Date Needed</label>
             <input type="date" id="f_dateneeded">
           </div>
           <div class="field">
-            <label>Requested By</label>
+            <label for="f_requestedby">Requested By</label>
             <input type="text" id="f_requestedby" placeholder="Name / designation">
           </div>
           <div class="field">
-            <label>Status</label>
+            <label for="f_status">Status</label>
             <select id="f_status">
               <option>Pending</option>
               <option>In Review</option>
@@ -139,7 +140,7 @@
             </select>
           </div>
           <div class="field full">
-            <label>Remarks</label>
+            <label for="f_remarks">Remarks</label>
             <textarea id="f_remarks" placeholder="Justification, notes, approver comments..."></textarea>
           </div>
         </div>
