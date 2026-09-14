@@ -1,17 +1,34 @@
 import { API_URL } from './config.js';
 
 function requireApiUrl() {
-  if (!API_URL) throw new Error('Set the Google Apps Script URL in js/config.js');
+  if (!API_URL || !/^https?:\/\//i.test(API_URL)) {
+    throw new Error('Set a valid Google Apps Script URL in js/config.js');
+  }
   return API_URL;
 }
 
-async function request(options) {
+async function request(options = {}) {
   const response = await fetch(requireApiUrl(), {
     ...options,
-    headers: { 'Content-Type': 'text/plain;charset=utf-8', ...(options.headers || {}) }
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8',
+      ...(options.headers || {})
+    }
   });
-  const result = await response.json();
-  if (!result.ok) throw new Error(result.error || 'Google Sheets request failed');
+
+  const rawText = await response.text();
+  let result;
+
+  try {
+    result = rawText ? JSON.parse(rawText) : {};
+  } catch (error) {
+    throw new Error(`Invalid API response from Google Apps Script (${response.status}).`);
+  }
+
+  if (!response.ok || !result || result.ok === false) {
+    throw new Error(result && result.error ? result.error : 'Google Sheets request failed');
+  }
+
   return result;
 }
 

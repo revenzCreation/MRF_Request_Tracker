@@ -1,16 +1,24 @@
 export function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  const target = document.getElementById('toast');
+  if (!target) return;
+  target.textContent = String(msg || '');
+  target.classList.add('show');
+  window.clearTimeout(target._toastTimer);
+  target._toastTimer = setTimeout(() => target.classList.remove('show'), 2200);
 }
 
 export function escapeHtml(s) {
-  return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
 }
 
 export function statusClass(s) {
-  return s.replace(/\s+/g, '');
+  return String(s || '').replace(/\s+/g, '') || 'unknown';
 }
 
 export function compressImage(file) {
@@ -24,17 +32,22 @@ export function compressImage(file) {
         const w = Math.round(img.width * scale);
         const h = Math.round(img.height * scale);
         const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
+        canvas.width = w;
+        canvas.height = h;
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas is not supported in this browser'));
+          return;
+        }
         ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
         resolve(canvas.toDataURL('image/jpeg', 0.68));
       };
-      img.onerror = reject;
+      img.onerror = () => reject(new Error('Image could not be processed'));
       img.src = e.target.result;
     };
-    reader.onerror = reject;
+    reader.onerror = () => reject(new Error('File could not be read'));
     reader.readAsDataURL(file);
   });
 }
