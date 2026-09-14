@@ -9,13 +9,37 @@ function requireApiUrl() {
 }
 
 async function request(options = {}) {
-  return window.HR_PORTAL_SHEETS.request({
+  const apiUrl = requireApiUrl();
+  const requestOptions = {
     ...options,
+    cache: 'no-store',
+    credentials: 'omit',
     headers: {
       'Content-Type': 'text/plain;charset=utf-8',
       ...(options.headers || {})
     }
-  });
+  };
+
+  try {
+    const response = await fetch(apiUrl, requestOptions);
+    const rawText = await response.text();
+    let result = {};
+
+    try {
+      result = rawText ? JSON.parse(rawText) : {};
+    } catch (error) {
+      throw new Error(`Invalid API response from Google Apps Script (${response.status}). URL: ${apiUrl}`);
+    }
+
+    if (!response.ok || !result || result.ok === false) {
+      throw new Error(result && result.error ? result.error : `Google Sheets request failed. URL: ${apiUrl}`);
+    }
+
+    return result;
+  } catch (error) {
+    const message = error && error.message ? error.message : `Google Sheets request failed. URL: ${apiUrl}`;
+    throw new Error(message);
+  }
 }
 
 export async function loadAllRecords() {
